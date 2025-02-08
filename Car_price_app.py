@@ -34,6 +34,7 @@ car_data=pd.DataFrame({'Brand':car_brand, 'Model':car_model, 'Year':car_year, 'F
 #Predict the house price
 prediction=model_cp.predict(car_data)
 
-#display the result
+    #display the result
 if st.button('Predict'):
-    st.write(f'The predicted car price is {prediction[0]*1000000}')
+    formatted_prediction = f"${prediction[0]:,.2f}"
+    st.write(f'The predicted car price is {formatted_prediction}')
