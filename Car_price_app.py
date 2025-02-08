@@ -11,45 +11,30 @@ with open('model_lr_cp_c0922989.pkl', 'rb') as file:
     model_cp = pickle.load(file)
 #model_cp=pickle.load(open('model_lr_cp_c0922989.pkl','rb'))
 
-car_brand = st.selectbox('Select the Brand:', options=label_encoders['Brand'].classes_)
-car_model = st.selectbox('Select the Model:', options=label_encoders['Model'].classes_)
-car_year = st.number_input('Year', min_value=1990, max_value=2023, step=1)
-car_fuel = st.selectbox('Type of Fuel:', options=label_encoders['Fuel_Type'].classes_)
-car_transmission = st.selectbox('Transmission Type:', options=label_encoders['Transmission'].classes_)
-car_mileage = st.number_input('Mileage', min_value=0)
-car_doors = st.number_input('Number of Doors', min_value=2, max_value=5, step=1)
+#get the input from the users
+car_brand=st.number_input('**Select the brand:** Kia:0, Chevrolet:1, Mercedes:2, Audi:3, Volkswagen:4, Toyota:5, Honda:6, BMW:7, Hyundai:8, Ford:9')
+car_model=st.number_input('**Select the model:** Rio:0, Malibu:1, GLA:2, Q5:3, Golf:4, Camry:5, Civic:6, Sportage:7, RAV4:8, 5 Series:9, CR-V:10, Elantra:11, Tiguan:12, Equinox:13, Explorer:14, A3:15, 3 Series:16, Tucson:17, Passat:18, Impala:19, Corolla:20, Optima:21, Fiesta:22, A4:23, Focus:24, E-Class:25, Sonata:26, C-Class:27, X5:28, Accord:29')
+car_year=st.number_input('**Year**')
+car_fuel=st.number_input('**Type of fuel:** Diesel:0, Hybrid:1, Petrol:2, Electric:3')
+car_t_a=st.number_input('**Automatic transmission** Yes=1, No=0')
+car_t_m=st.number_input('**Manual transmission** Yes=1, No=0')
+car_t_s=st.number_input('**Semi-Automatic transmission** Yes=1, No=0')
+car_mileage=st.number_input('**Mileage**')
+car_doors=st.number_input('**Number of Doors**')
 
-# Convert user inputs to encoded values
-car_data_input = pd.DataFrame({
-    'Brand': [label_encoders['Brand'].transform([car_brand])[0]],
-    'Model': [label_encoders['Model'].transform([car_model])[0]],
-    'Year': [car_year],
-    'Fuel_Type': [label_encoders['Fuel_Type'].transform([car_fuel])[0]],
-    'Transmission': [label_encoders['Transmission'].transform([car_transmission])[0]],
-    'Mileage': [car_mileage],
-    'Doors': [car_doors]
-})
 
-# Predict and display result
+#with this code we can request the input but we need to convert those inputs into dataframes
+#to do that we would need to use pandas
+#convert the user input to a dataframe
+car_data=pd.DataFrame({'Brand':car_brand, 'Model':car_model, 'Year':car_year, 'Fuel_Type':car_fuel, 'Mileage':car_mileage, 
+                        'Doors':car_doors, 'Transmission_Automatic':car_t_a, 'Transmission_Manual':car_t_m, 
+                        'Transmission_Semi-Automatic':car_t_s},index=[0])
+#Keys should be the same as column names and also the sequence should be the same
+
+#Predict the price
+prediction=model_cp.predict(car_data)
+
+    #display the result
 if st.button('Predict'):
-    prediction = model_cp.predict(car_data_input)
     formatted_prediction = f"${prediction[0]:,.2f}"
     st.write(f'The predicted car price is {formatted_prediction}')
-
-# Enhanced Data Visualization
-st.subheader('Data Visualizations')
-
-# Pairplot
-sns.pairplot(car_data)
-plt.suptitle('Pairplot of Car Pricing Data', y=1.02)
-st.pyplot(plt.gcf())
-
-# Correlation Matrix
-correlation_matrix = car_data.corr()
-st.write('Correlation Matrix:', correlation_matrix)
-
-# Heatmap of Correlations
-plt.figure(figsize=(10, 8))
-sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', linewidths=0.5)
-plt.title('Correlation Heatmap of Car Pricing Data')
-st.pyplot(plt.gcf())
